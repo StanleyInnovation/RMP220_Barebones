@@ -218,8 +218,19 @@ You should probably do the regardless, but these steps are really only required 
     * you may have set the wrong platform in the configuration
     * you may have the wrong embedded firmware
     * the platform may not be on
-4. **Save anything you might have open**
-5. **Power off the RMP**
+4. **Test the robot with some commands (MAKE SURE THE WHEELS ARE OFF THE GROUND)**
+  * You first have to put the robot into tractor mode by running the command
+  ```
+  rostopic pub -1 /segway/gp_command segway_msgs/ConfigCmd "{gp_cmd: 'GENERAL_PURPOSE_CMD_SET_OPERATIONAL_MODE', gp_param: 5}"
+  ```
+  * Start rqt_robot_steering by running the command
+  ```
+  rosrun rqt_robot_steering rqt_robot_steering
+  ```
+  * In the dialog box that opens set the command topic to /segway/cmd_vel
+  * Use the controls in the dialog box to send some motion commands to the robot to ensure it responds as expected
+5. **Save anything you might have open**
+6. **Power off the RMP**
   * Press the silver power button
     * You should hear the platform play the shutdown song
     * The status LED will turn solid red
