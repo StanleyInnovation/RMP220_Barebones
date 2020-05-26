@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!--
+Software License Agreement (BSD)
+
+\file      sick_lms1xx.urdf.xacro
+\authors   Patrick Hussey
+\copyright Copyright (c) 2015, WayPoint Robotics Inc., All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+   following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+   following disclaimer in the documentation and/or other materials provided with the distribution.
+ * Neither the name of WayPoint Robotics Inc. nor the names of its contributors may be used to endorse or promote
+   products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WAR-
+RANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, IN-
+DIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="segway_sensors">
+  
+    <xacro:macro name="segway_sensors">
+        
+        <xacro:property name="M_PI" value="3.14159"/>
+        
+        <!-- XSENSE MTi-2 IMU -->
+        <link name="imu_frame"/>
+        <joint name="imu_joint" type="fixed">
+            <origin xyz="-0.064612 -0.117995 0.08078" rpy="0 0 0" />
+            <parent link="base_chassis_link" />
+            <child link="imu_frame" />
+        </joint>
+        <gazebo>
+            <plugin name="imu_controller" filename="libhector_gazebo_ros_imu.so">
+                <alwaysOn>1</alwaysOn>
+                <updateRate>100.0</updateRate>
+                <bodyName>imu_frame</bodyName>
+                <topicName>/segway/feedback/imu</topicName>
+                <accelDrift>0.005 0.005 0.005</accelDrift>
+                <accelGaussianNoise>0.005 0.005 0.005</accelGaussianNoise>
+                <rateDrift>0.005 0.005 0.005 </rateDrift>
+                <rateGaussianNoise>0.005 0.005 0.005 </rateGaussianNoise>
+                <headingDrift>0.005</headingDrift>
+                <headingGaussianNoise>0.005</headingGaussianNoise>
+            </plugin>
+        </gazebo>
+       
+        <!-- Segway BSA -->
+        <link name="bsa_frame"/>
+        <joint name="bsa_joint" type="fixed">
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <parent link="base_chassis_link" />
+            <child link="bsa_frame" />
+        </joint>
+
+    </xacro:macro>
+
+</robot>
