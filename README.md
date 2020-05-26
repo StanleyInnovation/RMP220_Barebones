@@ -99,18 +99,13 @@ From a linux machine connected to the internet run the following commands
 ### Install required packages
 From a linux machine connected to the internet run the following commands
 
-1. **Install useful linux utilities**
-  * These tools are useful for monitoring system processes, setting up networking, and setting up NTPD for the remote computer. They are not neccessary but recommended.
-  ```
-  sudo apt-get install iperf chrony htop bridge-utils
-  ```
-2. **Install required ROS third party packages for segway_v3_robot**
+1. **Install required ROS third party packages for segway_v3_robot**
   * These are the packages that RMP V3 depends on or might be otherwise useful
   ```
   sudo apt-get -y install git xdotool wmctrl iperf chrony htop bridge-utils ecryptfs-utils ros-melodic-navigation ros-melodic-slam-karto ros-melodic-robot-localization ros-melodic-yocs-cmd-vel-mux ros-melodic-joy ros-melodic-urg-node ros-melodic-sick-tim ros-melodic-cmake-modules daemontools openssh-server libpcap0.8-dev ros-melodic-um7 ros-melodic-imu-tools ros-melodic-jsk-recognition ros-melodic-ros-controllers ros-melodic-gazebo-ros ros-melodic-gazebo-plugins ros-melodic-moveit ros-melodic-gazebo-ros-control ros-melodic-hector-gazebo-plugins ros-melodic-trac-ik ros-melodic-tf2-sensor-msgs ros-melodic-nmea-msgs ros-melodic-pointcloud-to-laserscan python-pip ros-melodic-cartographer-ros python-pymongo mongodb-server ros-melodic-move-base-msgs ros-melodic-pcl-ros ros-melodic-cv-bridge ros-melodic-map-server ros-melodic-rosbridge-suite ros-melodic-velodyne-gazebo-plugins festvox-us3 ros-melodic-cv-camera python-requests libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev ros-melodic-slam-gmapping ros-melodic-usb-cam ros-melodic-web-video-server ros-melodic-teb-local-planner ros-melodic-ar-track-alvar
   ```
 
-3. **Create a workspace in your home directory**
+2. **Create a workspace in your home directory**
   ```
   mkdir -p ~/segway_ws
   cd ~/segway_ws
