@@ -67,15 +67,7 @@ From a linux machine connected to the internet run the following commands
   sudo apt-get update
   sudo apt-get install ros-melodic-desktop-full
   ``` 
-
-4. **Initialize rosdep**
-  * You must initialize rosdep
-  ```
-  sudo rosdep init
-  rosdep update
-  ``` 
-
-5. **Environment setup**
+4. **Environment setup**
   * Edit the local bash environment to add a few useful aliases
   ```
   gedit ~/.bashrc
@@ -89,13 +81,22 @@ From a linux machine connected to the internet run the following commands
   alias clean_pyc='find ./ -name '*.pyc' | xargs rm'
   alias clean_rosbuild='rm -rf build devel install'
   ``` 
-
-6. **Getting rosinstall**
+  * Save the file and run the command
+  ```
+  source ~/.bashrc
+  ```
+5. **Installing dependancies for building packages**
   * rosinstall is a frequently used command-line tool in ROS that is distributed separately. It enables you to easily download many source trees for ROS packages with one command.
   ```
-  sudo apt-get install python-rosinstall
+  sudo apt-get install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
   ```
-
+6. **Initialize rosdep**
+  * You must initialize rosdep
+  ```
+  sudo rosdep init
+  rosdep update
+  ``` 
+  
 ### Install required packages
 From a linux machine connected to the internet run the following commands
 
