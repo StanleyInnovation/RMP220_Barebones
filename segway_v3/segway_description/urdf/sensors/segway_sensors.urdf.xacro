@@ -32,7 +32,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
         <!-- XSENSE MTi-2 IMU -->
         <link name="imu_frame"/>
         <joint name="imu_joint" type="fixed">
-            <origin xyz="-0.064612 -0.117995 0.08078" rpy="0 0 0" />
+            <origin xyz="-0.063902 -0.095661 0.094815" rpy="0 0 0" />
             <parent link="base_chassis_link" />
             <child link="imu_frame" />
         </joint>
