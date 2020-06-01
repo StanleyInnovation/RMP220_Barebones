@@ -16,6 +16,6 @@ sudo pip install evdev
 sudo pip install pyudev
 
 sudo cp /home/$USER/segway_ws/src/segway_v3/third_party_sensors/ds4drv/udev/50-ds4drv.rules /etc/udev/rules.d/
-sudo cp /home/$USER/segway_ws/src/vector_common/vector_third_party/ds4drv/ds4drv.conf /etc/
+sudo cp /home/$USER/segway_ws/src/segway_v3/third_party_sensors/ds4drv/ds4drv.conf /etc/
 sudo udevadm control --reload-rules
 sudo udevadm trigger
