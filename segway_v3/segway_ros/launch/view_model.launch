@@ -1,0 +1,16 @@
+<!-- Launch file for Segway platform startup -->
+
+<launch>
+    <!-- Platform specific robot state publisher and parameters -->
+    <include file="$(find segway_description)/launch/upload_rmp.launch"/>
+    
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+        <param name="publish_frequency" type="double" value="100.0" />
+    </node>
+  
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <rosparam param="source_list">[segway/rmp_joint_states]</rosparam>
+    </node>
+    
+</launch>

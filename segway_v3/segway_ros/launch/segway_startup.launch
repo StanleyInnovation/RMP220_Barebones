@@ -2,6 +2,7 @@
 
 <launch>
     <arg name="use_joystick" default="false"/>
+    <arg name="js_type" default="$(optenv SEGWAY_JOY_TYPE ds4)"/>
     <arg name="wd" default="false"/>
 
 	<!-- Segway System Watchdog is necessary for onboard PC -->
@@ -31,6 +32,9 @@
     
         
     <group if="$(arg use_joystick)">
+    
+        <include file="$(find ds4drv)/launch/ds4drv.launch" if="$(eval js_type == 'ds4')"/>
+        
         <node pkg="joy" type="joy_node" name="joy_node" if="$(optenv SEGWAY_HAS_ONBOARD_JOY false)">
             <param name="dev" type="string" value="$(optenv SEGWAY_JOY_DEV /dev/input/js0)" />
             <param name="deadzone" type="double" value="$(optenv SEGWAY_JOY_DEADZONE 0.1)" />
@@ -38,13 +42,18 @@
         </node>
         
         <node pkg="segway_ros" ns="segway" type="segway_teleop" name="segway_teleop" output="screen">
-            <rosparam file="$(find segway_bringup)/launch/teleop/config/$(optenv SEGWAY_JOY_MAPPING xbox360).yaml" command="load"/>
+            <param name="js_type" value="$(optenv SEGWAY_JOY_TYPE ds4)"/>
+        </node>
+
+        <node pkg="segway_ros" ns="segway" type="segway_marker_ctrl" name="segway_marker_ctrl" output="screen">
+            <param name="sim" value="false"/>
+            <param name="robot_name" value="RMP_220"/>
         </node>
         
         <group ns="segway">
             <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager"/>
             <node pkg="nodelet" type="nodelet" name="cmd_vel_mux" args="load yocs_cmd_vel_mux/CmdVelMuxNodelet nodelet_manager">
-                <param name="yaml_cfg_file" value="$(find segway_bringup)/launch/teleop/config/cmd_vel_mux.yaml"/>
+                <param name="yaml_cfg_file" value="$(find segway_ros)/launch/config/cmd_vel_mux.yaml"/>
             </node>
         </group>
     </group>
