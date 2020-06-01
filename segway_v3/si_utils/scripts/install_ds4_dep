@@ -14,6 +14,7 @@ fi
 sudo apt-get install python-pip
 sudo pip install evdev
 sudo pip install pyudev
+sudo apt-get install blueman
 
 sudo cp /home/$USER/segway_ws/src/segway_v3/third_party_sensors/ds4drv/udev/50-ds4drv.rules /etc/udev/rules.d/
 sudo cp /home/$USER/segway_ws/src/segway_v3/third_party_sensors/ds4drv/ds4drv.conf /etc/
