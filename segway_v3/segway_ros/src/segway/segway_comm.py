@@ -85,6 +85,8 @@ class SegwayDriver:
         Make sure we have a valid platform
         """
         self.platform = rospy.get_param('~platform',"RMP_110")
+        self.ip = rospy.get_param('~ip',"10.66.171.5")
+        self.port = rospy.get_param('~port',8080)
         if not (self.platform in SUPPORTED_PLATFORMS):
             rospy.logerr("Platform defined is not supported: %s",self.platform)
             return
@@ -133,7 +135,7 @@ class SegwayDriver:
         """
         self.tx_queue_ = multiprocessing.Queue()
         self.rx_queue_ = multiprocessing.Queue()
-        self.comm = IoEthThread(('10.66.171.5',8080),
+        self.comm = IoEthThread((self.ip,self.port),
                                 self.tx_queue_,
                                 self.rx_queue_,
                                 max_packet_size=1248)

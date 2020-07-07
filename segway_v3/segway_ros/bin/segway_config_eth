@@ -50,10 +50,9 @@ arising out of or based upon:
 --------------------------------------------------------------------"""
 import socket
 import argparse
-import os
+import os,sys
 import time
 from segway.utils import dottedQuadToNum,generate_cmd_bytes,validate_response
-import segway.crc16 as crc16
 from segway.system_defines import *
 
 def validate_ipv4(argument,name):
@@ -71,32 +70,13 @@ def validate_ipv4(argument,name):
             print("Invalid %s, octects must be less than 255" % name)
             exit(-1)
 
-def parse_hokuyo_ipv4(argument, name):
-    """
-    Each address must have 4 
-    """
-    validate_ipv4(argument, name)
-    
-    parsed = ""
-    for x in argument.split("."):
-        while len(x) < 3:
-            x = "0" + x
-        parsed += x
-    return parsed
-
 def parse_rmp_rsp(rsp,new_settings):
     
-    data = [ord(i) for i in rsp]
-    
-    
-    
-    valid_rsp,rsp_data = validate_response(data,len(data))
+    valid_rsp,rsp_data = validate_response(rsp)
     
     if not valid_rsp:
         return False
-    print new_settings,rsp_data[CCU_FRAM_ETH_IP_ADDRESS_INDEX:]
     for i in range(len(new_settings)):
-        print new_settings[i],rsp_data[CCU_FRAM_ETH_IP_ADDRESS_INDEX+i]
         if new_settings[i] != rsp_data[CCU_FRAM_ETH_IP_ADDRESS_INDEX+i]:
             valid_rsp = False
             break
@@ -104,43 +84,32 @@ def parse_rmp_rsp(rsp,new_settings):
 
 if __name__ == "__main__":
 
-
-    
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--segway_settings', help='The desired ethernet settings for the segway platform',
-                        default=['192.168.0.40',['10.66.171.5','255.255.255.0','10.66.171.1']])
-    parser.add_argument('--update_hokuyo', help='The desired IP address for the laser', default=False)
-    parser.add_argument('--hokuyo_settings', help='The desired ethernet settings for the hokuyo laser',
-                        default=['192.168.0.10',['10.66.171.6','255.255.255.0','10.66.171.1']])
-    
+    parser.add_argument('--present_ip', help='present IP address of the segway platform',
+                        default='10.66.171.6', required=True)
+    parser.add_argument('--present_port', help='present port number of the segway platform',
+                        default=8080, type=int, required=True)
+    parser.add_argument('--ip', help='The new IP address for the segway platform',
+                        default='10.66.171.5', required=True)
+    parser.add_argument('--netmask', help='The new netmask for the segway platform',
+                        default='255.255.255.0', required=True)
+    parser.add_argument('--gateway', help='The new gateway for the segway platform',
+                        default='10.66.171.1', required=True)
+    parser.add_argument('--port', help='The new port number for the segway platform',
+                        default=8080, type=int, required=True)
+                       
     args = parser.parse_args()
     
-    validate_ipv4(args.segway_settings[0],"Present Segway IP")
-    validate_ipv4(args.segway_settings[1][0],"New Segway IP")
-    validate_ipv4(args.segway_settings[1][1],"Present Segway Subnet")
-    validate_ipv4(args.segway_settings[1][2],"New Segway Gateway")
-
-    if (args.update_hokuyo):
-        ip = parse_hokuyo_ipv4(args.hokuyo_settings[1][0],"New hokuyo IP")
-        gw = parse_hokuyo_ipv4(args.hokuyo_settings[1][1],"Present hokuyo Subnet")
-        nm = parse_hokuyo_ipv4(args.hokuyo_settings[1][2],"New hokuyo Gateway")
-
-    """
-    First kill the segway core process
-    """
-    print "Shutting down the segway-core service"
-    os.system("sudo service segway-core status")
+    validate_ipv4(args.present_ip,"Present Segway IP")
+    validate_ipv4(args.ip,"New Segway IP")
+    validate_ipv4(args.netmask,"Present Segway Subnet")
+    validate_ipv4(args.gateway,"New Segway Gateway")
     
-    """
-    Initialize the CRC table incase it hasn't been yet
-    """
-    crc16.generate_crc_table()
-    
-    print("Connecting to Segway platform %s" % args.segway_settings[0])
+    print("Connecting to Segway platform %s:%d" % (args.present_ip,args.present_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.connect((args.segway_settings[0],8080))
+    sock.connect((args.present_ip,args.present_port))
     
-    set_continuous = [GENERAL_PURPOSE_CMD_ID,[RMP_CMD_SEND_CONTINUOUS_DATA,0]]
+    set_continuous = [GENERAL_PURPOSE_CMD_ID,[GENERAL_PURPOSE_CMD_SEND_CONTINUOUS_DATA,0]]
     cmd_bytes = generate_cmd_bytes(set_continuous)
     cmd_str = ''.join([chr(i) for i in cmd_bytes])
     sock.send(cmd_str)
@@ -162,10 +131,10 @@ if __name__ == "__main__":
         exit(-1)
     
     new_settings = [LOAD_ETH_CONFIG_CMD_ID,
-                    [dottedQuadToNum(args.segway_settings[1][0]),
-                     8080,
-                     dottedQuadToNum(args.segway_settings[1][1]),
-                     dottedQuadToNum(args.segway_settings[1][2])]]
+                    [dottedQuadToNum(args.ip),
+                     int(args.port),
+                     dottedQuadToNum(args.netmask),
+                     dottedQuadToNum(args.gateway)]]
     cmd_bytes = generate_cmd_bytes(new_settings)
     cmd_str = ''.join([chr(i) for i in cmd_bytes])
     
@@ -180,7 +149,7 @@ if __name__ == "__main__":
     while (attemps < 10) and not valid_settings:
         try:
             sock.settimeout(0.04)
-            returned = sock.recv(NUMBER_OF_RMP_RSP_BYTES)
+            returned = sock.recv(1248)
             valid_settings = parse_rmp_rsp(returned,new_settings[1])
             sock.send(cmd_str)
         except socket.timeout:
@@ -191,59 +160,6 @@ if __name__ == "__main__":
         exit(-1)
     
     print ("Segway platform has been updated")
-    
-    if (args.update_hokuyo):
-        msg = "$IP" + ip + nm + gw + chr(0x0a)
-        
-        print("Connecting to laser: %s" % args.hokuyo_settings[0])
-        sock = socket.socket()
-        sock.connect((args.hokuyo_settings[0], 10940))
-
-        print("Updating settings")
-        sock.send(msg)
-        try:
-            sock.settimeout(5)
-            returned = sock.recv(40)
-        except socket.timeout:
-            print("Laser did not return any packet, is probably not updated.")
-            sock.close()
-            exit(-1)
-        if msg != returned:
-            print("Laser does not appear to have updated")
-            sock.close()
-            exit(-1)
-            
-        print("Done updating, Rebooting the laser")
-        msg = "RB."
-        sock.send(msg)
-        try:
-            sock.settimeout(5)
-            returned = sock.recv(40)
-        except socket.timeout:
-            print("Laser does not appear to acknowledge reboot, please cycle power")
-            sock.close()
-            exit(-1)
-        if "RB.01Q.." != returned:
-            print("Laser does not appear to acknowledge reboot, please cycle power")
-            sock.close()
-            exit(-1)
-
-        sock.send(msg)
-        try:
-            sock.settimeout(5)
-            returned = sock.recv(40)
-        except socket.timeout:
-            print("Laser does not appear to acknowledge reboot, please cycle power")
-            sock.close()
-            exit(-1)
-        if "RB.00P.." != returned:
-            print("Laser does not appear to acknowledge reboot, please cycle power")
-            sock.close()
-            exit(-1)
-        
-
-    print "Please udpate the settings in the 50.segway_env.sh file that gets sources by workspace or by ros package"        
-
 
 
 

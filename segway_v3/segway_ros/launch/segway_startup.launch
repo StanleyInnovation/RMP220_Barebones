@@ -4,6 +4,8 @@
     <arg name="use_joystick" default="false"/>
     <arg name="js_type" default="$(optenv SEGWAY_JOY_TYPE ds4)"/>
     <arg name="wd" default="false"/>
+    <arg name="ip" default="10.66.171.6"/>
+    <arg name="port" default="8080"/>
 
 	<!-- Segway System Watchdog is necessary for onboard PC -->
 	<node pkg="segway_ros" type="segway_wd" name="segway_wd" respawn="true" if="$(arg wd)"/>
@@ -12,6 +14,8 @@
     <!-- Segway Base platform ROS Driver -->
     <node pkg="segway_ros" ns="segway" type="segway_driver" name="segway_driver" respawn="true" output="screen">
         <param name="platform" value="RMP_220" />
+        <param name="ip" value="$(arg ip)" />
+        <param name="port" value="$(arg port)" />
     </node>
 
     <!-- Platform specific robot state publisher and parameters -->
