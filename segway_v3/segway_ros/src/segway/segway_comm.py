@@ -153,7 +153,6 @@ class SegwayDriver:
         self.reset_pub = rospy.Publisher('/odometry_is_reset', Empty, queue_size=10)
         self._subs.append(rospy.Subscriber('/reset_odometry', Empty, self._reset_odometry))
         self._subs.append(rospy.Subscriber("/segway/cmd_vel", Twist, self._add_motion_command_to_queue))
-        self._subs.append(rospy.Subscriber("/segway/cmd_vel", Twist, self._add_motion_command_to_queue))
         self._subs.append(rospy.Subscriber("/segway/gp_command",ConfigCmd,self._add_config_command_to_queue))
         self._subs.append(rospy.Subscriber("/move_base/TrajectoryPlannerROS/parameter_updates",Config,self._update_move_base_params))
         self._subs.append(rospy.Subscriber("/move_base/DWAPlannerROS/parameter_updates",Config,self._update_move_base_params))
@@ -233,6 +232,14 @@ class SegwayDriver:
         Indicate the driver is up with motor audio
         """
         cmds = [GENERAL_PURPOSE_CMD_ID,[GENERAL_PURPOSE_CMD_SET_AUDIO_COMMAND,MOTOR_AUDIO_PLAY_EXIT_ALARM_SONG]]
+        self._add_command_to_queue(cmds)
+        
+        rospy.sleep(3)
+
+        """
+        Set the mode to tractor
+        """
+        cmds = [GENERAL_PURPOSE_CMD_ID,[GENERAL_PURPOSE_CMD_SET_OPERATIONAL_MODE,TRACTOR_REQUEST]]
         self._add_command_to_queue(cmds)
     
     def Shutdown(self):
